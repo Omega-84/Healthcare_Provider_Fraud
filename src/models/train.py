@@ -9,7 +9,16 @@ from xgboost import XGBClassifier
 from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import train_test_split
 
-def train_model(df: pd.DataFrame, target: str):
+def train_model(df: pd.DataFrame, target: str, xgb_params: dict = None):
+    """
+    Train XGBoost model with MLflow logging.
+    
+    Args:
+        df: Training DataFrame
+        target: Target column name
+        xgb_params: Optional XGBoost parameters (from tuning). 
+                    If None, uses defaults.
+    """
 
     X = df.drop(['Provider',target],axis=1)
     y = df[target]
@@ -37,12 +46,21 @@ def train_model(df: pd.DataFrame, target: str):
 
     scale_pos_weight = round((y_train==0).sum()/(y_train==1).sum())
 
-    xgb = XGBClassifier(
-    objective='binary:logistic',
-    eval_metric='auc',
-    n_jobs=-1,
-    random_state=42,
-    scale_pos_weight=scale_pos_weight)
+    # Default XGBoost parameters
+    default_params = {
+        'objective': 'binary:logistic',
+        'eval_metric': 'auc',
+        'n_jobs': -1,
+        'random_state': 42,
+        'scale_pos_weight': scale_pos_weight
+    }
+    
+    # Merge with custom params if provided
+    if xgb_params is not None:
+        default_params.update(xgb_params)
+        default_params['scale_pos_weight'] = scale_pos_weight  # Always recalculate
+    
+    xgb = XGBClassifier(**default_params)
 
     pipe_xgb = make_pipeline(preprocessor, xgb)
 
@@ -53,13 +71,7 @@ def train_model(df: pd.DataFrame, target: str):
         roc = roc_auc_score(y_test, preds)
 
         # Log params, metrics, and model
-        mlflow.log_params({
-            "objective": "binary:logistic",
-            "eval_metric": "auc",
-            "scale_pos_weight": scale_pos_weight,
-            "test_size": 0.33,
-            "random_state": 42
-        })
+        mlflow.log_params({**default_params, "test_size": 0.33})
         mlflow.log_metric("roc_auc", roc)
         mlflow.sklearn.log_model(pipe_xgb, "model")
 
@@ -68,3 +80,4 @@ def train_model(df: pd.DataFrame, target: str):
         mlflow.log_input(train_ds, context="training")
 
         print(f"Model trained. ROC AUC: {roc:.4f}")
+        return pipe_xgb, roc
