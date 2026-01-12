@@ -119,7 +119,7 @@ def validate_outpatient_data(df: pd.DataFrame, raise_on_fail: bool = False) -> D
        'ClmDiagnosisCode_9', 'ClmDiagnosisCode_10', 'ClmProcedureCode_1',
        'ClmProcedureCode_2', 'ClmProcedureCode_3', 'ClmProcedureCode_4',
        'ClmProcedureCode_5', 'ClmProcedureCode_6', 'DeductibleAmtPaid',
-       'ClmAdmitDiagnosisCode', 'Is_Outpatient'
+       'ClmAdmitDiagnosisCode'
     ]
     
     for col in required_columns:

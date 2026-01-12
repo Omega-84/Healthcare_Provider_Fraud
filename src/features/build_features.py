@@ -2,14 +2,18 @@ import os
 import pandas as pd 
 import numpy as np 
 
-def generate_top_codes(df, save_directory) -> None:
+def generate_top_codes(df, save_directory) -> tuple:
     top_diagnosis_code = df.groupby(['ClmAdmitDiagnosisCode'])['ClaimID'].count().reset_index().sort_values(by='ClaimID', ascending=False).head(20)['ClmAdmitDiagnosisCode'].unique()
-    pd.DataFrame(top_diagnosis_code,columns=['ClmAdmitDiagnosisCode']).to_csv(os.path.join(save_directory,"top_diagnosis_code.csv"),index=False)
+    diag = pd.DataFrame(top_diagnosis_code,columns=['ClmAdmitDiagnosisCode'])
+    diag.to_csv(os.path.join(save_directory,"top_diagnosis_code.csv"),index=False)
     top_20_attending = df['AttendingPhysician'].value_counts().head(20).index
     top_20_operating = df['OperatingPhysician'].value_counts().head(20).index
-    pd.DataFrame(top_20_attending,columns=['AttendingPhysician']).to_csv(os.path.join(save_directory,"top_attending_physician.csv"),index=False)
-    pd.DataFrame(top_20_operating,columns=['OperatingPhysician']).to_csv(os.path.join(save_directory,"top_operating_physician.csv"),index=False)
+    attend = pd.DataFrame(top_20_attending,columns=['AttendingPhysician'])
+    attend.to_csv(os.path.join(save_directory,"top_attending_physician.csv"),index=False)
+    op = pd.DataFrame(top_20_operating,columns=['OperatingPhysician'])
+    op.to_csv(os.path.join(save_directory,"top_operating_physician.csv"),index=False)
 
+    return (diag,attend,op)
 
 def create_claims_features(df: pd.DataFrame,top_diagnosis_code: pd.DataFrame,top_attending_physician: pd.DataFrame,top_operating_physician: pd.DataFrame) -> pd.DataFrame:
     df['billing_before_admission'] = (df['ClaimStartDt'] - df['AdmissionDt']).dt.days < 0            
