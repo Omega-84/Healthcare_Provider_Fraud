@@ -1,23 +1,24 @@
 import numpy as np
 import pandas as pd
-import mlflow
-import mlflow.sklearn
 from sklearn.pipeline import make_pipeline
 from sklearn.compose import make_column_transformer
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from xgboost import XGBClassifier
-from sklearn.metrics import roc_auc_score
+from sklearn.metrics import roc_auc_score, recall_score, f1_score
 from sklearn.model_selection import train_test_split
 
 def train_model(df: pd.DataFrame, target: str, xgb_params: dict = None):
     """
-    Train XGBoost model with MLflow logging.
+    Train XGBoost model.
     
     Args:
         df: Training DataFrame
         target: Target column name
         xgb_params: Optional XGBoost parameters (from tuning). 
                     If None, uses defaults.
+    
+    Returns:
+        tuple: (trained_pipeline, roc_auc_score)
     """
 
     X = df.drop(['Provider',target],axis=1)
@@ -64,20 +65,13 @@ def train_model(df: pd.DataFrame, target: str, xgb_params: dict = None):
 
     pipe_xgb = make_pipeline(preprocessor, xgb)
 
-    with mlflow.start_run():
-        # Train model
-        pipe_xgb.fit(X_train, y_train)
-        preds = pipe_xgb.predict_proba(X_test)[:, 1]
-        roc = roc_auc_score(y_test, preds)
+    # Train model
+    pipe_xgb.fit(X_train, y_train)
+    preds_proba = pipe_xgb.predict_proba(X_test)[:, 1]  # For ROC-AUC
+    preds = pipe_xgb.predict(X_test)  # Binary predictions for recall/f1
+    roc = roc_auc_score(y_test, preds_proba)
+    recall = recall_score(y_test, preds)
+    f1 = f1_score(y_test, preds)
 
-        # Log params, metrics, and model
-        mlflow.log_params({**default_params, "test_size": 0.33})
-        mlflow.log_metric("roc_auc", roc)
-        mlflow.sklearn.log_model(pipe_xgb, "model")
+    return pipe_xgb, roc, recall, f1
 
-        # 🔑 Log dataset so it shows in MLflow UI
-        train_ds = mlflow.data.from_pandas(df, source="training_data")
-        mlflow.log_input(train_ds, context="training")
-
-        print(f"Model trained. ROC AUC: {roc:.4f}")
-        return pipe_xgb, roc

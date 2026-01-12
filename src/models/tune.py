@@ -64,14 +64,14 @@ def tune_model(df: pd.DataFrame, target: str):
     direction='maximize',  # Maximize AUC
     study_name='xgboost_fraud_detection_prod')
 
-    study.optimize(objective, n_trials=100, show_progress_bar=True)
+    study.optimize(objective, n_trials=30, show_progress_bar=True)
 
     best_params = study.best_params
     best_params.update({
     "random_state": 42,
     "n_jobs": -1,
     "scale_pos_weight": scale_pos_weight,
-    "eval_metric": "logloss"
+    "eval_metric": "auc"
     })
 
     print("Best Params:", best_params)
