@@ -40,3 +40,6 @@ Thumbs.db
 test.ipynb
 pip_test.ipynb
 
+fastapi_test.ipynb
+test_api.py
+
