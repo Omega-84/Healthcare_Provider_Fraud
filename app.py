@@ -5,7 +5,6 @@ import numpy as np
 import pandas as pd
 
 model = joblib.load('artifacts/model.pkl')
-features_columns = joblib.load("./artifacts/feature_columns.pkl")
 
 class Features(BaseModel):
     count_unique_beneficiary: float
