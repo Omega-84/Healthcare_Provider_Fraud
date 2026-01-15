@@ -173,15 +173,27 @@ def main():
         print("STAGE 6: SAVING MODEL FOR INFERENCE")
         print("=" * 60)
 
+        # Log model to MLflow (native format)
+        mlflow.sklearn.log_model(model, "model")
+        print("✅ Model logged to MLflow")
+
+        # Also save locally with joblib for quick access
         model_path = os.path.join(ARTIFACTS_DIR, "model.pkl")
         joblib.dump(model, model_path)
-        mlflow.log_artifact("./artifacts/model.pkl")
         print(f"✅ Model saved to {model_path}")
 
         # Save feature columns for inference
         feature_cols = [col for col in features_train.columns if col not in ['Provider', 'PotentialFraud']]
+        
+        # Save as pickle for programmatic use
         joblib.dump(feature_cols, os.path.join(ARTIFACTS_DIR, "feature_columns.pkl"))
-        print(f"✅ Feature columns saved to {ARTIFACTS_DIR}/feature_columns.pkl")
+        
+        # Save as text for MLflow artifact (readable)
+        feature_cols_path = os.path.join(ARTIFACTS_DIR, "feature_columns.txt")
+        with open(feature_cols_path, "w") as f:
+            f.write("\n".join(feature_cols))
+        mlflow.log_artifact(feature_cols_path)
+        print(f"✅ Feature columns saved ({len(feature_cols)} features)")
 
         # =========================================================================
         # COMPLETE
@@ -193,7 +205,10 @@ def main():
         print(f"Model Recall: {recall:.4f}")
         print(f"Model F1 Score: {f1:.4f}")
         print(f"Model saved to: {model_path}")
-        print(f"To run MLflow UI: mlflow ui")
+        print(f"\n📝 Next steps:")
+        print(f"  1. Run: python scripts/export_model.py")
+        print(f"  2. Commit: git add src/serving/model/ && git commit")
+        print(f"  3. View MLflow: mlflow ui")
 
 
 if __name__ == "__main__":

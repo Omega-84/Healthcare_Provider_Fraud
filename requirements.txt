@@ -1,11 +1,27 @@
+# Core ML
 pandas
 numpy
 scikit-learn
+xgboost
+optuna
+
+# MLflow
 mlflow
+
+# API & Serving
 fastapi
-uvicorn
+uvicorn[standard]
 pydantic
+gradio
+
+# Utils
 python-dotenv
 joblib
+
+# Validation & Testing
 great-expectations
 pytest
+requests
+
+# Development
+jupyter
