@@ -24,9 +24,11 @@ from src.features import generate_top_codes, create_claims_features, merge_benef
 from src.models import train_model, tune_model, evaluate_model
 
 # === Configuration ===
-DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "data")
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+DATA_DIR = os.path.join(PROJECT_ROOT, "data")
 PROCESSED_DIR = os.path.join(DATA_DIR, "processed")
-ARTIFACTS_DIR = os.path.join(os.path.dirname(__file__), "..", "artifacts")
+ARTIFACTS_DIR = os.path.join(PROJECT_ROOT, "artifacts")
+MLFLOW_URI = f"file://{PROJECT_ROOT}/mlruns"
 
 # Create directories if they don't exist
 os.makedirs(PROCESSED_DIR, exist_ok=True)
@@ -34,7 +36,7 @@ os.makedirs(ARTIFACTS_DIR, exist_ok=True)
 
 
 def main():
-    mlflow.set_tracking_uri("file:///home/nayya/Healthcare_Project/mlruns")
+    mlflow.set_tracking_uri(MLFLOW_URI)
     mlflow.set_experiment("Healthcare Fraud Provider Pipeline")  
     
     with mlflow.start_run(run_name="full_pipeline"):

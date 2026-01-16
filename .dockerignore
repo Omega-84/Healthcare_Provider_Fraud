@@ -1,0 +1,44 @@
+# Git
+.git/
+.gitignore
+
+# Data & Models (large files)
+data/
+mlruns/
+artifacts/
+mlflow.db
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.eggs/
+*.egg
+health/
+.venv/
+venv/
+
+# Notebooks
+notebooks/
+*.ipynb
+
+# IDE
+.vscode/
+.idea/
+
+# Testing
+tests/
+pytest_cache/
+.coverage
+test_api.py
+fastapi_test.ipynb
+pip_test.ipynb
+test.ipynb
+
+# Other
+*.md
+*.log
+.gradio/
+.dockerignore
+Dockerfile

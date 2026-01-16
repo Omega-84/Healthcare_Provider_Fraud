@@ -1,0 +1,12 @@
+# Core (minimal for inference)
+pandas
+numpy
+scikit-learn
+xgboost
+joblib
+
+# API & Serving
+fastapi
+uvicorn[standard]
+pydantic
+gradio
