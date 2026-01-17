@@ -43,3 +43,6 @@ pip_test.ipynb
 fastapi_test.ipynb
 test_api.py
 
+github-actions_accessKeys.csv
+github-actions_credentials.csv
+
