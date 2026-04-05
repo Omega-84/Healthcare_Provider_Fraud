@@ -39,7 +39,9 @@ Thumbs.db
 # Testing notebook
 test.ipynb
 pip_test.ipynb
-
+notebooks/impact.ipynb
+scripts/calculate_monetary_impact.py
+scripts/find_feature_importance.py
 fastapi_test.ipynb
 test_api.py
 
